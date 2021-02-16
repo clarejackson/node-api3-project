@@ -14,4 +14,4 @@ function validatePost(req, res, next) {
   // DO YOUR MAGIC
 }
 
-// do not forget to expose these functions to other modules
+// do not forget to export these functions to other modules
