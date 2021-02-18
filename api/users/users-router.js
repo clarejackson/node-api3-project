@@ -1,9 +1,19 @@
 const express = require('express');
+const { whereNotExists } = require('../../data/db-config');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+const users = require("./users-model")
+
+router.get('/', (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
+  users.get()
+  .then((users) => {
+    res.status(200).json(users)
+  })
+  .catch((error) => {
+    next(error)
+  })
 });
 
 router.get('/:id', (req, res) => {
