@@ -1,5 +1,5 @@
-const users = require("../users/users-router")
-const post = require("../posts/posts-router")
+const users = require("../users/users-model")
+const post = require("../posts/posts-model")
 
 function logger() {
   // DO YOUR MAGIC
@@ -11,8 +11,21 @@ function logger() {
   }
 
 
-function validateUserId(req, res, next) {
+function validateUserId() {
   // DO YOUR MAGIC
+  return (req, res, next) => {
+    users.getById(req.params.id)
+    .then((user) => {
+      if (user) {
+        req.user = user
+        next()
+      } else {
+        res.status(404).json({
+          message: "User not found",
+        })
+      }
+    })
+  }
 }
 
 function validateUser(req, res, next) {

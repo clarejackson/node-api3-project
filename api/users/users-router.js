@@ -1,6 +1,6 @@
 const express = require('express');
 const { whereNotExists } = require('../../data/db-config');
-
+const { validateUserId } = require("../middleware/middleware")
 const router = express.Router();
 
 const users = require("./users-model")
@@ -16,9 +16,10 @@ router.get('/', (req, res, next) => {
   })
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId(), (req, res) => {
   // RETURN THE USER OBJECT
   // this needs a middleware to verify user id
+  res.json(req.user)
 });
 
 router.post('/', (req, res) => {
@@ -32,14 +33,30 @@ router.put('/:id', (req, res) => {
   // and another middleware to check that the request body is valid
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId(), (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
+  users.remove(req.params.id)
+  .then((count) => {
+    if (count > 0) {
+      res.json(count)
+    }
+  })
+  .catch((error) => {
+    next(error)
+  })
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId(), (req, res, next) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
+  users.getUserPosts(req.params.id)
+  .then((posts) => {
+    res.status(200).json(posts)
+  })
+  .catch((error) => {
+    next(error)
+  })
 });
 
 router.post('/:id/posts', (req, res) => {
