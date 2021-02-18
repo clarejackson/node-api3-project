@@ -1,6 +1,15 @@
-function logger(req, res, next) {
+const users = require("../users/users-router")
+const post = require("../posts/posts-router")
+
+function logger() {
   // DO YOUR MAGIC
-}
+  return (req, res, next) => {
+    const time = new Date().toISOString()
+    console.log(`[${time}] ${req.method} ${req.url}`)
+    next() 
+  }  
+  }
+
 
 function validateUserId(req, res, next) {
   // DO YOUR MAGIC
@@ -15,3 +24,9 @@ function validatePost(req, res, next) {
 }
 
 // do not forget to export these functions to other modules
+module.exports = {
+  logger,
+  validateUserId,
+  validateUser,
+  validatePost
+}
