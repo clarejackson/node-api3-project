@@ -28,8 +28,21 @@ function validateUserId() {
   }
 }
 
-function validateUser(req, res, next) {
+function validateUser() {
   // DO YOUR MAGIC
+  return (req, res, next) => {
+    if (!req.body) {
+      return res.status(400).json({
+        message: "Missing user data"
+      })
+    } 
+    if (!req.body.name) {
+      return res.status(400).json({
+        message: "Missing required name field"
+      })
+    }
+    next()
+  }
 }
 
 function validatePost(req, res, next) {

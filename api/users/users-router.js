@@ -1,6 +1,6 @@
 const express = require('express');
 const { whereNotExists } = require('../../data/db-config');
-const { validateUserId } = require("../middleware/middleware")
+const { validateUserId, validateUser } = require("../middleware/middleware")
 const router = express.Router();
 
 const users = require("./users-model")
@@ -11,9 +11,7 @@ router.get('/', (req, res, next) => {
   .then((users) => {
     res.status(200).json(users)
   })
-  .catch((error) => {
-    next(error)
-  })
+  .catch(next)
 });
 
 router.get('/:id', validateUserId(), (req, res) => {
@@ -22,9 +20,14 @@ router.get('/:id', validateUserId(), (req, res) => {
   res.json(req.user)
 });
 
-router.post('/', (req, res) => {
+router.post('/', validateUser(), (req, res, next) => {
   // RETURN THE NEWLY CREATED USER OBJECT
   // this needs a middleware to check that the request body is valid
+  users.insert(req.body)
+  .then((user) => {
+    res.status(201).json(user)
+  })
+  .catch(next)
 });
 
 router.put('/:id', (req, res) => {
@@ -42,9 +45,7 @@ router.delete('/:id', validateUserId(), (req, res, next) => {
       res.json(count)
     }
   })
-  .catch((error) => {
-    next(error)
-  })
+  .catch(next)
 });
 
 router.get('/:id/posts', validateUserId(), (req, res, next) => {
@@ -54,9 +55,7 @@ router.get('/:id/posts', validateUserId(), (req, res, next) => {
   .then((posts) => {
     res.status(200).json(posts)
   })
-  .catch((error) => {
-    next(error)
-  })
+  .catch(next)
 });
 
 router.post('/:id/posts', (req, res) => {
