@@ -1,9 +1,11 @@
 const express = require('express');
-const { whereNotExists } = require('../../data/db-config');
-const { validateUserId, validateUser } = require("../middleware/middleware")
+// const { userParams, whereNotExists } = require('../../data/db-config');
+const { validateUserId, validateUser, validatePost } = require("../middleware/middleware")
 const router = express.Router();
 
 const users = require("./users-model")
+const posts = require("../posts/posts-model");
+// const { OPEN_READWRITE } = require('sqlite3');
 
 router.get('/', (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
@@ -30,10 +32,15 @@ router.post('/', validateUser(), (req, res, next) => {
   .catch(next)
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId(), validateUser(), (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  users.update(req.params.id, req.body)
+  .then((user) => {
+    res.status(200).json(user)
+  })
+  .catch(next)
 });
 
 router.delete('/:id', validateUserId(), (req, res, next) => {
@@ -52,16 +59,25 @@ router.get('/:id/posts', validateUserId(), (req, res, next) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
   users.getUserPosts(req.params.id)
-  .then((posts) => {
-    res.status(200).json(posts)
+  .then((post) => {
+    res.status(200).json(post)
   })
   .catch(next)
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId(), validatePost(),(req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  let body = req.body
+  body["user_id"] = req.params.id
+  console.log(body)
+  posts.insert(body)
+  .then((newPost) => {
+    console.log(newPost)
+    res.json(newPost)
+  })
+  .catch(next)
 });
 
 // do not forget to export the router

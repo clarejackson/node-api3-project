@@ -45,8 +45,21 @@ function validateUser() {
   }
 }
 
-function validatePost(req, res, next) {
+function validatePost() {
   // DO YOUR MAGIC
+  return (req, res, next) => {
+    if (!req.body) {
+      return res.status(400).json({
+        message: "Missing post data"
+      })
+    }
+    if (!req.body.text) {
+      return res.status(400).json({
+        message: "Missing required text field"
+      })
+    }
+    next()
+  }
 }
 
 // do not forget to export these functions to other modules
